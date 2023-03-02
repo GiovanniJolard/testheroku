@@ -60,9 +60,9 @@ def main():
         samp = data.sample(n=nrows, random_state=1)
         data2 = samp[infos_descrip].set_index('SK_ID_CURR')
         data1 = samp[columns_list].set_index('SK_ID_CURR')
-        return data, data1, data2
+        return data1, data2
 
-    data, data1, data2 = load_data1(1000)
+    data1, data2 = load_data1(1000)
 
     # Selecting one client
     id_client = st.selectbox('Select ID Client :', data1.index)
@@ -80,7 +80,7 @@ def main():
     
     if st.button('Vérifier la solvabilité'):
         
-        data_pred = data.set_index('SK_ID_CURR').loc[id_client].to_numpy().reshape(1, -1)
+        data_pred = data1.loc[id_client].to_numpy().reshape(1, -1)
         prediction = classifier.predict(data_pred)[0]
         proba = classifier.predict_proba(data_pred)[0, 1]
 
