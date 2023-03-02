@@ -60,9 +60,9 @@ def main():
         samp = data.sample(n=nrows, random_state=1)
         data2 = samp[infos_descrip].set_index('SK_ID_CURR')
         data1 = samp[columns_list].set_index('SK_ID_CURR')
-        return data1, data2
+        return data, data1, data2
 
-    data1, data2 = load_data1(1000)
+    data, data1, data2 = load_data1(1000)
 
     # Selecting one client
     id_client = st.selectbox('Select ID Client :', data1.index)
