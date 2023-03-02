@@ -79,7 +79,7 @@ def main():
 # Prédiction de la solvabilité du client
     
     if st.button('Vérifier la solvabilité'):
-        data = pd.read_csv('application_train_echantillon.csv').set_index('SK_ID_CURR')
+        data = pd.read_csv('application_train_short.csv').set_index('SK_ID_CURR')
         data_pred = data.loc[id_client]
         prediction = classifier.predict(data_pred)[0]
         proba = classifier.predict_proba(data_pred)[0, 1]
