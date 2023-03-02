@@ -80,7 +80,6 @@ def main():
     
     if st.button('Vérifier la solvabilité'):
         data = pd.read_csv('application_train_echantillon.csv').set_index('SK_ID_CURR')
-        id_client = st.selectbox('Select ID Client :', data1.index)
         data_pred = data.loc[id_client]
         prediction = classifier.predict(data_pred)[0]
         proba = classifier.predict_proba(data_pred)[0, 1]
