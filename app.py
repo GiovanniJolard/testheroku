@@ -51,7 +51,7 @@ def main():
     "\n"
     
     def load_data(nrows):
-        data = pd.read_csv("application_train.csv")
+        data = pd.read_csv("application_train_echantillon.csv")
         data = data.sample(n=nrows, random_state=1)
         return data
 
