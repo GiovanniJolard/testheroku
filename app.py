@@ -56,7 +56,7 @@ def main():
         return data
 
     def load_data1(nrows):
-        data = pd.read_csv('application_train.csv')
+        data = pd.read_csv('application_train_echantillon.csv')
         samp = data.sample(n=nrows, random_state=1)
         data2 = samp[infos_descrip].set_index('SK_ID_CURR')
         data1 = samp[columns_list].set_index('SK_ID_CURR')
