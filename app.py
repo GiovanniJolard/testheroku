@@ -8,9 +8,7 @@ from datetime import date
 import hashlib
 import ast
 import pickle
-import matplotlib.pyplot as plt
 from PIL import Image
-import seaborn as sns
 
 
 def request_prediction(model_uri, data):
