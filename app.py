@@ -46,7 +46,7 @@ def main():
     
     st.title("Mon application Streamlit")
     
-    pickle_in = open("LGBMClassifier.pkl", "rb")
+    pickle_in = open("API_LGBMClassifier.pkl", "rb")
     classifier = pickle.load(pickle_in)     
     "\n"
     
