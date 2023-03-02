@@ -80,7 +80,7 @@ def main():
     
     if st.button('Vérifier la solvabilité'):
         data = pd.read_csv('application_train_echantillon.csv')
-        data_pred = data.loc[id_client].to_numpy().reshape(1, -1)
+        data_pred = data.loc[id_client]
         prediction = classifier.predict(data_pred)[0]
         proba = classifier.predict_proba(data_pred)[0, 1]
 
