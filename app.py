@@ -1,125 +1,243 @@
-import requests
-import json
-import pandas as pd
-import numpy as np
-import streamlit as st
-import datetime
-from datetime import date
-import hashlib
-import ast
+# -*- coding: utf-8 -*-
+"""
+Created on Sun May  8 21:01:15 2022
+@author: siddhardhan
+"""
+
 import pickle
-import matplotlib.pyplot as plt
-from PIL import Image
-import seaborn as sns
+import streamlit as st
+from streamlit_option_menu import option_menu
 
 
-def request_prediction(model_uri, data):
-    # sourcery skip: raise-specific-error, use-fstring-for-formatting
-    headers = {"Content-Type": "application/json"}
+# loading the saved models
 
-    data_json = {'data': data}
-    response = requests.request(method='POST', headers=headers, url=model_uri, json=data_json)
+diabetes_model = pickle.load(open('diabetes_model.sav', 'rb'))
 
-    if response.status_code != 200:
-        raise Exception("Request failed with status {}, {}".format(response.status_code, response.text))
-    return response.json()
+heart_disease_model = pickle.load(open('heart_disease_model.sav', 'rb'))
 
-columns_list = ['SK_ID_CURR', 'EXT_SOURCE_3', 'DAYS_LAST_PHONE_CHANGE', 'REGION_POPULATION_RELATIVE',
-                'TOTALAREA_MODE', 'HOUR_APPR_PROCESS_START', 'DAYS_BIRTH',
-                'DAYS_EMPLOYED', 'AMT_INCOME_TOTAL', 'OBS_60_CNT_SOCIAL_CIRCLE',
-                'FLAG_DOCUMENT_3', 'OBS_30_CNT_SOCIAL_CIRCLE', 'EXT_SOURCE_2',
-                'DEF_60_CNT_SOCIAL_CIRCLE', 'AMT_ANNUITY', 'DAYS_ID_PUBLISH',
-                'DEF_30_CNT_SOCIAL_CIRCLE', 'AMT_GOODS_PRICE','AMT_CREDIT',
-                    'CNT_FAM_MEMBERS'
-                ]
+parkinsons_model = pickle.load(open('parkinsons_model.sav', 'rb'))
 
-infos_descrip = ['SK_ID_CURR',
-                 "CODE_GENDER",
-                 "CNT_CHILDREN",
-                 "NAME_FAMILY_STATUS",
-                 "NAME_HOUSING_TYPE",
-                 "NAME_CONTRACT_TYPE",
-                 "NAME_INCOME_TYPE",
-                 "OCCUPATION_TYPE",
-                 "AMT_INCOME_TOTAL"
-                 ]
 
-def main():
+
+# sidebar for navigation
+with st.sidebar:
     
-    st.title("Mon application Streamlit")
+    selected = option_menu('Multiple Disease Prediction System',
+                          
+                          ['Diabetes Prediction',
+                           'Heart Disease Prediction',
+                           'Parkinsons Prediction'],
+                          icons=['activity','heart','person'],
+                          default_index=0)
     
-    pickle_in = open("LGBMClassifier.pkl", "rb")
-    classifier = pickle.load(pickle_in)     
-    "\n"
     
-    def load_data(nrows):
-        data = pd.read_csv("application_train.csv")
-        data = data.sample(n=nrows, random_state=1)
-        return data
-
-    def load_data1(nrows):
-        data = pd.read_csv('application_train.csv')
-        samp = data.sample(n=nrows, random_state=1)
-        data2 = samp[infos_descrip].set_index('SK_ID_CURR')
-        data1 = samp[columns_list].set_index('SK_ID_CURR')
-        return data1, data2
-
-    data1, data2 = load_data1(1000)
-
-    # Selecting one client
-    id_client = st.selectbox('Select ID Client :', data1.index)
-    if id_client:
-        # Visualizing the personal data of the selected client
-        st.subheader('Les informations du client %s : ' % id_client)
-        st.table(data2.astype(str).loc[id_client][1:9])
-        "\n"
+# Diabetes Prediction Page
+if (selected == 'Diabetes Prediction'):
+    
+    # page title
+    st.title('Diabetes Prediction using ML')
+    
+    
+    # getting the input data from the user
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        Pregnancies = st.text_input('Number of Pregnancies')
         
-    # Afficher les données financières du client sélectionné
-    st.subheader('Données financières du client %s :' % id_client)
-    st.write(data1.loc[id_client])
+    with col2:
+        Glucose = st.text_input('Glucose Level')
+    
+    with col3:
+        BloodPressure = st.text_input('Blood Pressure value')
+    
+    with col1:
+        SkinThickness = st.text_input('Skin Thickness value')
+    
+    with col2:
+        Insulin = st.text_input('Insulin Level')
+    
+    with col3:
+        BMI = st.text_input('BMI value')
+    
+    with col1:
+        DiabetesPedigreeFunction = st.text_input('Diabetes Pedigree Function value')
+    
+    with col2:
+        Age = st.text_input('Age of the Person')
+    
+    
+    # code for Prediction
+    diab_diagnosis = ''
+    
+    # creating a button for Prediction
+    
+    if st.button('Diabetes Test Result'):
+        diab_prediction = diabetes_model.predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+        
+        if (diab_prediction[0] == 1):
+          diab_diagnosis = 'The person is diabetic'
+        else:
+          diab_diagnosis = 'The person is not diabetic'
+        
+    st.success(diab_diagnosis)
+
+
+
+
+# Heart Disease Prediction Page
+if (selected == 'Heart Disease Prediction'):
+    
+    # page title
+    st.title('Heart Disease Prediction using ML')
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        age = st.text_input('Age')
+        
+    with col2:
+        sex = st.text_input('Sex')
+        
+    with col3:
+        cp = st.text_input('Chest Pain types')
+        
+    with col1:
+        trestbps = st.text_input('Resting Blood Pressure')
+        
+    with col2:
+        chol = st.text_input('Serum Cholestoral in mg/dl')
+        
+    with col3:
+        fbs = st.text_input('Fasting Blood Sugar > 120 mg/dl')
+        
+    with col1:
+        restecg = st.text_input('Resting Electrocardiographic results')
+        
+    with col2:
+        thalach = st.text_input('Maximum Heart Rate achieved')
+        
+    with col3:
+        exang = st.text_input('Exercise Induced Angina')
+        
+    with col1:
+        oldpeak = st.text_input('ST depression induced by exercise')
+        
+    with col2:
+        slope = st.text_input('Slope of the peak exercise ST segment')
+        
+    with col3:
+        ca = st.text_input('Major vessels colored by flourosopy')
+        
+    with col1:
+        thal = st.text_input('thal: 0 = normal; 1 = fixed defect; 2 = reversable defect')
+        
+        
      
-# Prédiction de la solvabilité du client
+     
+    # code for Prediction
+    heart_diagnosis = ''
     
-    if st.button('Vérifier la solvabilité'):
-        data_pred = data1.loc[id_client].to_numpy().reshape(1, -1)
-        prediction = classifier.predict(data_pred)[0]
-        proba = classifier.predict_proba(data_pred)[0, 1]
-
-        # Affichage de la prédiction de solvabilité
-        st.subheader('Prédiction de solvabilité :')
-        st.write('Le client %s est ' % id_client, 'solvable' if prediction else 'insolvable')
-        st.write('avec une probabilité de %0.2f %%' % (proba * 100))
+    # creating a button for Prediction
+    
+    if st.button('Heart Disease Test Result'):
+        heart_prediction = heart_disease_model.predict([[age, sex, cp, trestbps, chol, fbs, restecg,thalach,exang,oldpeak,slope,ca,thal]])                          
         
-        proba_non_remboursement = 1 - proba
-
-        # Créer le graphique
-        fig, ax = plt.subplots()
-        ax.pie([proba, proba_non_remboursement], labels=['Probabilité de remboursement', 'Probabilité de non-remboursement'], autopct='%1.1f%%')
-        ax.set_title('Probabilité de remboursement pour le client %s' % id_client)
-
-        # Afficher le graphique dans Streamlit
-        st.pyplot(fig)
+        if (heart_prediction[0] == 1):
+          heart_diagnosis = 'The person is having heart disease'
+        else:
+          heart_diagnosis = 'The person does not have any heart disease'
         
+    st.success(heart_diagnosis)
         
-    if st.button('Voulez-vous voir les informations utilisées ?'):
-        image = Image.open('image.png')
-        st.image(image, caption='Importance des features', use_column_width=True)
-        
-    # Checkbox pour afficher les graphiques des autres clients similaires
-    if st.checkbox('Les autres clients similaires ?'):
-        st.subheader('Les autres clients similaires %s :' % id_client)
-        feature_name = st.selectbox('Sélectionner le nom de la caractéristique :', [
-            "AMT_INCOME_TOTAL",
-            "DAYS_EMPLOYED",
-            "REGION_POPULATION_RELATIVE",
-            "DAYS_BIRTH",
-            "DAYS_ID_PUBLISH",
-            "AMT_CREDIT"
-        ])
-        fig, ax = plt.subplots()
-        sns.countplot(x=feature_name, data=data1)
-        ax.set_title('Distribution de la caractéristique %s pour les clients' % feature_name)
-        st.pyplot(fig)
+    
+    
 
-if __name__ == '__main__':
-    main()
+# Parkinson's Prediction Page
+if (selected == "Parkinsons Prediction"):
+    
+    # page title
+    st.title("Parkinson's Disease Prediction using ML")
+    
+    col1, col2, col3, col4, col5 = st.columns(5)  
+    
+    with col1:
+        fo = st.text_input('MDVP:Fo(Hz)')
+        
+    with col2:
+        fhi = st.text_input('MDVP:Fhi(Hz)')
+        
+    with col3:
+        flo = st.text_input('MDVP:Flo(Hz)')
+        
+    with col4:
+        Jitter_percent = st.text_input('MDVP:Jitter(%)')
+        
+    with col5:
+        Jitter_Abs = st.text_input('MDVP:Jitter(Abs)')
+        
+    with col1:
+        RAP = st.text_input('MDVP:RAP')
+        
+    with col2:
+        PPQ = st.text_input('MDVP:PPQ')
+        
+    with col3:
+        DDP = st.text_input('Jitter:DDP')
+        
+    with col4:
+        Shimmer = st.text_input('MDVP:Shimmer')
+        
+    with col5:
+        Shimmer_dB = st.text_input('MDVP:Shimmer(dB)')
+        
+    with col1:
+        APQ3 = st.text_input('Shimmer:APQ3')
+        
+    with col2:
+        APQ5 = st.text_input('Shimmer:APQ5')
+        
+    with col3:
+        APQ = st.text_input('MDVP:APQ')
+        
+    with col4:
+        DDA = st.text_input('Shimmer:DDA')
+        
+    with col5:
+        NHR = st.text_input('NHR')
+        
+    with col1:
+        HNR = st.text_input('HNR')
+        
+    with col2:
+        RPDE = st.text_input('RPDE')
+        
+    with col3:
+        DFA = st.text_input('DFA')
+        
+    with col4:
+        spread1 = st.text_input('spread1')
+        
+    with col5:
+        spread2 = st.text_input('spread2')
+        
+    with col1:
+        D2 = st.text_input('D2')
+        
+    with col2:
+        PPE = st.text_input('PPE')
+        
+    
+    
+    # code for Prediction
+    parkinsons_diagnosis = ''
+    
+    # creating a button for Prediction    
+    if st.button("Parkinson's Test Result"):
+        parkinsons_prediction = parkinsons_model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])                          
+        
+        if (parkinsons_prediction[0] == 1):
+          parkinsons_diagnosis = "The person has Parkinson's disease"
+        else:
+          parkinsons_diagnosis = "The person does not have Parkinson's disease"
+        
+    st.success(parkinsons_diagnosis)
